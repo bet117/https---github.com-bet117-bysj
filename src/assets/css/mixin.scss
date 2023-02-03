@@ -1,0 +1,10 @@
+@mixin bgColor() {
+    //background:rgb(104, 117, 229);
+    [data-theme=theme1] #{if(&, "&", "*")} {
+        background: slategrey;
+    }
+
+    [data-theme=theme2] #{if(&, "&", "*")} {
+        background: snow;
+    }
+}

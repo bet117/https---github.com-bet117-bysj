@@ -4,8 +4,16 @@ import Cookies from "../api/Cookie.js";
 import MenuLost from "@/pages/MenuLost.vue";
 import MenuFind from "@/pages/MenuFind.vue";
 import SendFind from "@/pages/SendFind.vue";
+import UserList from "@/pages/UserList.vue";
+import MineMsg from "@/pages/MineMsg.vue";
 import BysjMain from "@/pages/Main.vue";
 import TimeLine from "@/pages/TimeLine.vue";
+//获取原型对象上的push函数
+const originalPush = Vuerouter.prototype.push
+//修改原型对象中的push方法
+Vuerouter.prototype.push = function push(location) {
+   return originalPush.call(this, location).catch(err => err)
+}
 const router = new Vuerouter({
   routes: [
     {
@@ -34,6 +42,16 @@ const router = new Vuerouter({
           component: TimeLine,
         },
       ],
+    },
+    {
+      path: "/userList",
+      name: "UserList",
+      component: UserList,
+    },
+    {
+      path: "/mineMsg",
+      name: "MineMsg",
+      component: MineMsg,
     },
   ],
 });

@@ -30,11 +30,16 @@ export default {
                         label:'类别',
                         indexCode:'type'
                     },
+                    {
+                        label:'操作',
+                        indexCode:'action'
+                    },
                 ],
                 list:[
                     {
                     name:'小明',
                     type:'证件',
+                    action:'操作',
                     }
                 ]
             },

@@ -12,30 +12,27 @@
           <el-table-column type="expand">
             <template slot-scope="props">
               <el-form label-position="left" inline class="demo-table-expand">
-                <el-form-item label="失物标题">
-                  <span>{{ props.row.name }}</span>
-                </el-form-item>
                 <el-form-item label="所属地区">
-                  <span>{{ props.row.shop }}</span>
+                  <span>{{ props.row.area }}</span>
                 </el-form-item>
                 <el-form-item label="ID">
                   <span>{{ props.row.id }}</span>
                 </el-form-item>
                 <el-form-item label="物品分类">
-                  <span>{{ props.row.category }}</span>
+                  <span>{{ props.row.type }}</span>
                 </el-form-item>
                 <el-form-item label="联系方式">
-                  <span>{{ props.row.address }}</span>
+                  <span>{{ props.row.phone }}</span>
                 </el-form-item>
               </el-form>
             </template>
           </el-table-column>
           <el-table-column label="ID" prop="id"> </el-table-column>
-          <el-table-column label="失物类别" prop="name"> </el-table-column>
+          <el-table-column label="失物类别" prop="type"> </el-table-column>
           <el-table-column label="操作" width="300" align="center">
             <template slot-scope="scope">
               <el-button @click="details(scope.row)" type="text" size="big"
-                >问题回答</el-button
+                >挂失信息修改</el-button
               >
             </template>
           </el-table-column>
@@ -67,12 +64,9 @@
           </el-form-item>
         </el-form>
         <div class="demo-drawer__footer">
-          <el-button @click="()=>{}">取 消</el-button>
-          <el-button
-            type="primary"
-            @click="$refs.drawer.closeDrawer()"
-            :loading="loading"
-            >{{ loading ? "提交中 ..." : "确 定" }}</el-button
+          <el-button @click="closeDrawer">返 回</el-button>
+          <el-button type="primary" @click="submitQuestion"
+            >确 定</el-button
           >
         </div>
       </div>
@@ -83,6 +77,7 @@
 <script>
 import BysjTopMenu from "@/components/topMenu.vue";
 import BysjAsideMenu from "@/components/asideMenu.vue";
+import {selectThings} from "../api/action"
 export default {
   name: "MenuLost",
   components: { BysjTopMenu, BysjAsideMenu },
@@ -91,36 +86,7 @@ export default {
       found: "去拾捡归还",
       drawer: false,
       direction: "rtl",
-      tableData: [
-        {
-          id: "12987122",
-          name: "好滋好味鸡蛋仔",
-          category: "江浙小吃、小吃零食",
-          address: "上海市普陀区真北路",
-          shop: "王小虎夫妻店",
-        },
-        {
-          id: "12987123",
-          name: "好滋好味鸡蛋仔",
-          category: "江浙小吃、小吃零食",
-          address: "上海市普陀区真北路",
-          shop: "王小虎夫妻店",
-        },
-        {
-          id: "12987125",
-          name: "好滋好味鸡蛋仔",
-          category: "江浙小吃、小吃零食",
-          address: "上海市普陀区真北路",
-          shop: "王小虎夫妻店",
-        },
-        {
-          id: "12987126",
-          name: "好滋好味鸡蛋仔",
-          category: "江浙小吃、小吃零食",
-          address: "上海市普陀区真北路",
-          shop: "王小虎夫妻店",
-        },
-      ],
+      tableData:[],
       form: {
         name: "",
         region: "",
@@ -131,25 +97,25 @@ export default {
         resource: "",
         desc: "",
       },
-      loading:false
+      rowData:{}
     };
   },
-  created() {},
+  async created() {
+    let res=await selectThings()
+    this.tableData=res.data.data.filter(x=>x.lose!=null)
+  },
   mounted() {},
 
   methods: {
     details(row) {
       this.drawer = true;
-      console.log("row", row);
-      // this.$confirm(`确定当前用户账号吗?`, "提示", {
-      //   confirmButtonText: "确定",
-      //   cancelButtonText: "取消",
-      //   type: "warning",
-      // })
-      //   .then(() => {
-      //     console.log("row", row);
-      //   })
-      //   .catch(() => {});
+      this.rowData=row
+    },
+    submitQuestion(){
+
+    },
+    closeDrawer() {
+      this.drawer = false;
     },
   },
   

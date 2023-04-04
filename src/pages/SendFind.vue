@@ -9,17 +9,19 @@
           <BysjTopMenu :title="found"></BysjTopMenu>
         </el-header>
         <div style="overflow-y: scroll">
+          <el-steps :active="active" finish-status="success">
+            <el-step title="提交物品信息"></el-step>
+            <el-step title="确认物品问题"></el-step>
+          </el-steps>
           <el-form
             ref="form"
             :model="form"
             label-width="80px"
-            style="margin-top: 20px"
+            style="margin-top: 20px; height: 500px"
+            v-if="active == 0"
           >
-            <el-form-item label="姓名" prop="name">
-              <el-input v-model="form.name"></el-input>
-            </el-form-item>
-            <el-form-item label="区域" prop="region">
-              <el-select v-model="form.region" placeholder="请选择发现物品区域">
+            <el-form-item label="区域" prop="area">
+              <el-select v-model="form.area" placeholder="请选择发现物品区域">
                 <el-option
                   v-for="(a, index) in area"
                   :label="a"
@@ -28,15 +30,18 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="拾捡时间" prop="date1">
+            <el-form-item label="拾捡时间" prop="date">
               <el-col :span="11">
                 <el-date-picker
                   type="date"
                   placeholder="选择日期"
-                  v-model="form.date1"
+                  v-model="form.date"
                   style="width: 50%"
                 ></el-date-picker>
               </el-col>
+            </el-form-item>
+            <el-form-item label="联系方式" prop="phone">
+              <el-input v-model="form.phone" style="width:300px"></el-input>
             </el-form-item>
             <el-form-item label="物品类别" prop="type">
               <el-select v-model="form.type" placeholder="请选择物品类别">
@@ -48,46 +53,86 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="归还形式" prop="desc">
-              <el-checkbox-group v-model="form.desc">
-                <el-checkbox-button
-                  label="邮寄到付"
-                  name="desc"
-                ></el-checkbox-button>
-                <el-checkbox-button
-                  label="线下归还"
-                  name="desc"
-                ></el-checkbox-button>
-              </el-checkbox-group>
+            <el-form-item label="归还形式" prop="returnmethod">
+              <el-radio-group v-model="form.returnmethod">
+                <el-radio label="邮寄到付"></el-radio>
+                <el-radio label="线下归还"></el-radio>
+              </el-radio-group>
             </el-form-item>
-            <el-form-item label="相关物品验证问题" prop="ques">
-              <el-input type="textarea" v-model="form.ques"></el-input>
+            <el-form-item label="招领/挂失" prop="lostOrFound">
+              <el-radio-group v-model="lostOrFound">
+                <el-radio label="find">招领</el-radio>
+                <el-radio label="lose">挂失</el-radio>
+              </el-radio-group>
             </el-form-item>
-            <el-form-item label="正确回答" prop="msg">
-              <el-input type="textarea" v-model="form.answerRight"></el-input>
-            </el-form-item>
-            <el-form-item label="干扰项1" prop="msg">
-              <el-input type="textarea" v-model="form.answerWrong1"></el-input>
-            </el-form-item>
-            <el-form-item label="干扰项2" prop="msg">
-              <el-input type="textarea" v-model="form.answerWrong2"></el-input>
-            </el-form-item>
-            <el-form-item label="其他" prop="msg">
-              <el-input type="textarea" v-model="form.msg"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="submitForm">提交</el-button>
-              <el-button @click="resetForm('form')">重置</el-button>
+            <el-form-item label="照片" prop="imge">
+              <el-upload
+                class="upload-demo"
+                ref="upload"
+                action="http://10.18.191.174:8081/api/pictures"
+                :on-remove="handleRemove"
+                :file-list="fileList"
+                list-type="picture"
+                :http-request="uploadFile"
+                name="upload"
+                :limit="1"
+              >
+                <el-button size="small" type="primary">点击上传</el-button>
+                <div slot="tip" class="el-upload__tip">
+                  只能上传jpg/png文件，且不超过500kb
+                </div>
+              </el-upload>
             </el-form-item>
           </el-form>
-          <router-link
-            :to="{
-              name: 'TimeLine',
-            }"
+          <el-form
+            :model="questionForm"
+            ref="questionForm"
+            label-width="80px"
+            style="margin-top: 20px; height: 470px"
+            v-if="active == 1"
           >
-            查看时间线
-          </router-link>
-          <router-view></router-view>
+            <el-form-item label="相关物品验证问题 （注：回答不能相同！）" prop="question">
+              <el-input
+                type="textarea"
+                v-model="questionForm.question"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="正确回答" prop="answerright">
+              <el-input
+                type="textarea"
+                v-model="questionForm.answerright"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="干扰项1" prop="answerwrong1">
+              <el-input
+                type="textarea"
+                v-model="questionForm.answerwrong1"
+              ></el-input>
+            </el-form-item>
+            <el-form-item label="干扰项2" prop="answerwrong2">
+              <el-input
+                type="textarea"
+                v-model="questionForm.answerwrong2"
+              ></el-input>
+            </el-form-item>
+          </el-form>
+          <el-form
+            ref="resForm"
+            label-width="80px"
+            style="margin-top: 20px; height: 470px"
+            v-if="active == 2"
+          >
+            <el-form-item>成功了</el-form-item>
+          </el-form>
+          <el-form ref="btnForm" label-width="80px" style="margin-top: 20px">
+            <el-form-item>
+              <el-button type="primary" @click="submitForm">下一步·</el-button>
+              <el-button type="primary" @click="cancelUpload" v-if="active == 0"
+                >取消</el-button
+              >
+              <el-button @click="resetForm" v-if="active != 2">重置</el-button>
+            </el-form-item>
+          </el-form>
         </div>
         <el-footer>
           <i class="el-icon-s-help"></i>
@@ -99,7 +144,8 @@
 </template>
 
 <script>
-// import axios from "axios";
+import axios from "axios";
+import { delThings, addThings, addQuestion} from "../api/action.js";
 import BysjTopMenu from "@/components/topMenu.vue";
 import BysjAsideMenu from "@/components/asideMenu.vue";
 export default {
@@ -109,16 +155,19 @@ export default {
     return {
       found: "去失物招领",
       form: {
-        name: "",
-        region: "",
-        date1: "",
-        type: [],
-        desc: [],
-        msg: "",
-        ques: "",
-        answerRight: "",
-        answerWrong1: "",
-        answerWrong2: "",
+        area: "",
+        date: "",
+        type: "",
+        returnmethod: "",
+        imge: "",
+        phone:""
+      },
+      lostOrFound: "",
+      questionForm: {
+        question: "",
+        answerright: "",
+        answerwrong1: "",
+        answerwrong2: "",
       },
       area: [
         "北京",
@@ -170,6 +219,10 @@ export default {
         "书籍/文件",
         "其他",
       ],
+      fileList: [],
+      imgId: "",
+      thingsId: "",
+      active: 0,
     };
   },
   created() {
@@ -180,15 +233,97 @@ export default {
 
   methods: {
     async submitForm() {
-    //   let res = await axios.post("/api/login", { ...this.form });
-    //   this.$notify.error({
-    //     title: res.data.msg,
-    //     message: "用户名或密码错误！",
-    //   });
-    console.log("表格数据",this.form)
+      let steps = this.active;
+      switch (steps) {
+        case 0:
+          if (!this.imgId) {
+            this.$notify({
+              title: "警告",
+              message: "物品信息不完整",
+              type: "warning",
+            });
+            return false;
+          }
+          this.addThings();
+          break;
+        case 1:
+          this.addQuestions();
+          break;
+        case 2:
+          break;
+      }
+      if (this.active++ > 1) this.active = 0;
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields();
+    resetForm() {
+      this.$refs["form"].resetFields();
+      this.$refs["questionForm"].resetFields();
+    },
+    handleRemove() {
+      this.cancelUpload();
+    },
+    async uploadFile(data) {
+      let myFile = data.file;
+      let fd = new FormData();
+      fd.append("file", myFile);
+      let res = await axios({
+        url: "/api/things/pictures",
+        method: "POST",
+        config: {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+        data: fd,
+      });
+      if (res.data.code == 200) {
+        this.imgId = res.data.data;
+      } else {
+        this.$notify.error({
+          title: res.data.msg,
+          message: "上传图片失败！",
+        });
+      }
+    },
+    async cancelUpload() {
+      if (!this.imgId) return;
+      let res = await delThings({ id: this.imgId });
+      if (res.data.code == 200) {
+        this.fileList = [];
+      } else {
+        this.$notify.error({
+          title: res.data.msg,
+          message: "取消上传失败！",
+        });
+      }
+    },
+    async addThings() {
+      this.lostOrFound=="find"?this.form.find=localStorage.getItem("userId"):this.form.lose=localStorage.getItem("userId");
+      this.$refs["form"].validate(async (valid) => {
+      if (valid) {
+        let res = await addThings({ ...this.form, id: this.imgId });
+        if (res.data.code == 200) {
+          this.thingsId = res.data.data;
+        } else {
+          this.$notify.error({
+            title: res.data.msg,
+            message: "物品信息上传失败！",
+          });
+        }
+      }})
+    },
+    async addQuestions() {
+      this.$refs["questionForm"].validate(async (valid) => {
+      if (valid) {
+        let res = await addQuestion({ ...this.questionForm, thingsid: this.thingsId });
+        if (res.data.code == 200) {
+          console.log(">>>.")
+        } else {
+          this.$notify.error({
+            title: res.data.msg,
+            message: "问卷上传失败！",
+          });
+        }
+      }})
     },
   },
 };

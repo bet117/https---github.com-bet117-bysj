@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-container>
-      <el-aside width="200px">
+      <el-aside width="300px">
         <BysjAsideMenu></BysjAsideMenu>
       </el-aside>
       <el-container class="container">
@@ -126,7 +126,7 @@
           </el-form>
           <el-form ref="btnForm" label-width="80px" style="margin-top: 20px">
             <el-form-item>
-              <el-button type="primary" @click="submitForm">下一步·</el-button>
+              <el-button type="primary" @click="submitForm" :disabled="isEnd">下一步·</el-button>
               <el-button type="primary" @click="cancelUpload" v-if="active == 0"
                 >取消</el-button
               >
@@ -223,6 +223,7 @@ export default {
       imgId: "",
       thingsId: "",
       active: 0,
+      isEnd:false
     };
   },
   created() {
@@ -253,6 +254,7 @@ export default {
           break;
       }
       if (this.active++ > 1) this.active = 0;
+      console.log(">>>>>>>>",this.active)
     },
     resetForm() {
       this.$refs["form"].resetFields();
@@ -316,7 +318,8 @@ export default {
       if (valid) {
         let res = await addQuestion({ ...this.questionForm, thingsid: this.thingsId });
         if (res.data.code == 200) {
-          console.log(">>>.")
+          this.isEnd=true
+          console.log("问卷上传成功")
         } else {
           this.$notify.error({
             title: res.data.msg,

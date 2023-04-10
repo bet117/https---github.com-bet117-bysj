@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-container class="container">
-      <el-aside width="200px">
+      <el-aside width="300px">
         <BysjAsideMenu></BysjAsideMenu>
       </el-aside>
       <el-container>
@@ -100,10 +100,12 @@ export default {
 
   methods: {
     async initData(){
-      let res = await selectUser({id:localStorage.getItem("userId")});
-      let res1 = await selectThings();
+      let id=localStorage.getItem("userId")
+      let res = await selectUser({id:id});
+      let res1 = await selectThings({find:id})
+      let res2 = await selectThings({lose:id})
       this.tableData = [res.data.data];
-      this.findData = res1.data.data;
+      this.findData = [...res1.data.data,...res2.data.data];
     },
     changePassword(row){
       this.rowData=row
@@ -135,8 +137,8 @@ export default {
     close(){
       this.centerDialogVisible = false
     },
-    details(){
-
+    details(row){
+      console.log(row)
     }
   },
 };

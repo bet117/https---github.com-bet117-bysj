@@ -22,6 +22,6 @@ export const updateUsersAnswer=(params)=>axios.post("/api/updateUsersAnswer",par
 //根据thingsId查询问卷
 export const selectQuestionByThingsId=(params)=>axios.get("/api/question/selectQuestionByThingsId",{params})
 //获取物品列表
-export const selectThings=(params)=>axios.get("/api/things/selectThings",params)
+export const selectThings=(params)=>axios.get("/api/things/selectThings",{params})
 //获取用户名列表
 export const getUserList=()=>axios.get("/api/selectAllUsers")

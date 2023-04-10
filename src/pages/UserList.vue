@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-container class="container">
-      <el-aside width="200px">
+      <el-aside width="300px">
         <BysjAsideMenu></BysjAsideMenu>
       </el-aside>
       <el-container>
